@@ -1,0 +1,35 @@
+name: feed
+on:
+  schedule:
+    - cron: "17 */6 * * *"      # every 6 h, off the hour (CelesTrak asks for at most one fetch per object per 2 h)
+  workflow_dispatch:
+  push:
+    paths: ["notes.json", "tools/build_feed.py"]
+
+concurrency: { group: feed, cancel-in-progress: false }
+permissions: { contents: write }
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install requests
+      # fails the job (and publishes nothing) if a source is down; the app keeps the last good feed
+      - run: python tools/build_feed.py --out feed.json --notes notes.json
+      - name: Sanity check
+        run: |
+          python - <<'PY'
+          import json; f = json.load(open("feed.json"))
+          assert f["version"] == 1 and f["satellites"] and f["aurora"]["kp"], "empty feed"
+          print(len(f["bodies"]), "bodies,", len(f["approaches"]), "approaches,", len(f["satellites"]), "satellites")
+          PY
+      - name: Publish
+        run: |
+          git config user.name "skytoday-feed"
+          git config user.email "skytoday-feed@users.noreply.github.com"
+          git add feed.json
+          git diff --cached --quiet || (git commit -qm "feed $(date -u +%FT%TZ)" && git push)

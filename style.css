@@ -1,0 +1,4 @@
+:root{--bg:#120c0b;--ink:#ebddc4;--muted:#a89682;--gold:#c9a25b}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(1100px 620px at 50% -10%,#3a261b,var(--bg));color:var(--ink);font:17px/1.6 -apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif}
+main{max-width:720px;margin:0 auto;padding:56px 20px 80px}h1,h2{font-family:"Cormorant Garamond","Iowan Old Style",Georgia,serif;font-weight:600}h1{font-size:42px;margin:.2em 0}h2{font-size:25px;margin-top:2em}
+a{color:var(--gold)}.eyebrow{color:var(--gold);letter-spacing:.14em;text-transform:uppercase;font-size:12px;font-weight:600}.muted{color:var(--muted)}
